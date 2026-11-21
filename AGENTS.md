@@ -124,3 +124,10 @@ User approved a dark, mobile-friendly website styled like the second design refe
 - `build_site.py` now produces one JSON per scan and a manifest sorted by scan time. `docs/assets/app.js` displays every scan time and can load both old daily and new time-stamped files. `docs/index.html` labels scan times and warns prices may be delayed.
 - User's published website is https://williamandrea.github.io/oliver-kell-screener/. Its HTML was accessible, but live `docs/data/manifest.json` could **not** be read with available tools. Therefore, the exact reason BRIS and PKPK were missing was **not confirmed**. Possible reasons: published manifest is missing/stale or one or more stock rules failed. Never add these stocks to passing results without checking all 7 rules. After upload, verify site `data/manifest.json` and run `python screener.py --tickers BRIS,PKPK` locally.
 - New local tests cover separate scan files and multiple scans per date. Next: upload changed files preserving folder paths, manually run one GitHub workflow, inspect output and confirm site displays a time and any matching stocks. If Yahoo daily bars do not update within the trading session, consider using Yahoo intraday bars to build today's candle.
+
+## Latest change (2026-11-21): simpler website
+
+- User requested only four sections, in this order: `Oliver Kell Screener` title, short seven-rule summary, latest passing-stock table, and last update time.
+- Removed dashboard cards, charts, history controls, and extra header elements from the website. Kept dark mobile-friendly styling.
+- `docs/assets/app.js` still reads the newest scan from `docs/data/manifest.json` and shows safe plain text, including an empty/error state. Earlier history files remain saved and unchanged.
+- No screener rules, schedules, or GitHub Actions files changed. After publishing, check the latest table and timestamp on GitHub Pages.

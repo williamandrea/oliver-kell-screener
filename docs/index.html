@@ -4,104 +4,48 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a1120">
-  <meta name="description" content="Daily IDX stock screener results and history. Seven technical screening rules.">
+  <meta name="description" content="Oliver Kell Screener: latest IDX stock screening results.">
   <meta name="referrer" content="no-referrer">
-  <title>IDX Pulse — Daily Stock Screener</title>
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <title>Oliver Kell Screener</title>
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/app.js" defer></script>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="./" aria-label="IDX Pulse home">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg></span>
-        <span>IDX <strong>Pulse</strong></span>
-      </a>
-      <span class="live-pill"><span class="live-dot"></span> Market scans · WIB</span>
+  <main class="page">
+    <header class="heading">
+      <h1>Oliver Kell Screener</h1>
+      <p class="rules" aria-label="Screening rules">
+        Price ≥ Rp250 <span>·</span> Price ≥ EMA10 <span>·</span> EMA10 ≥ EMA20 <span>·</span>
+        EMA20 ≥ EMA20 (5 days ago) <span>·</span> Value MA5 ≥ Rp5B <span>·</span>
+        Avg. daily range 5D ≥ 5% <span>·</span> Price ≤ MA20 × 1.05
+      </p>
     </header>
 
-    <main>
-      <section class="hero" aria-labelledby="page-title">
-        <div>
-          <div class="eyebrow"><span class="eyebrow-line"></span> INDONESIA STOCK EXCHANGE</div>
-          <h1 id="page-title">Market overview<span class="headline-dot">.</span></h1>
-          <p class="subline">A simple view of stocks that meet all 7 screening rules.</p>
-        </div>
-        <div class="date-picker-box">
-          <label for="scan-date">SCAN TIME</label>
-          <div class="select-wrap">
-            <select id="scan-date" aria-label="Choose scan" disabled><option>Loading dates...</option></select>
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-      </section>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
 
-      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-
-      <section class="metric-grid" aria-label="Daily scan summary">
-        <article class="metric metric-primary">
-          <div class="metric-label"><span class="metric-symbol green">↗</span> MATCHED STOCKS</div>
-          <div class="metric-number" id="passed-count">—</div>
-          <div class="metric-caption">Passed all screening rules</div>
-          <span class="metric-decoration" aria-hidden="true">↗</span>
-        </article>
-        <article class="metric">
-          <div class="metric-label"><span class="metric-symbol blue">◉</span> VALID STOCKS</div>
-          <div class="metric-number" id="valid-count">—</div>
-          <div class="metric-caption">With usable daily data</div>
-        </article>
-        <article class="metric">
-          <div class="metric-label"><span class="metric-symbol amber">◷</span> DATA MISSING</div>
-          <div class="metric-number" id="missing-count">—</div>
-          <div class="metric-caption">Unavailable or unusable</div>
-        </article>
-      </section>
-
-      <section class="panel coverage-panel" aria-label="Scan coverage">
-        <div class="coverage-row"><div><span class="small-label">SCAN COVERAGE</span><p class="coverage-caption" id="coverage-caption">Waiting for results</p></div><strong id="coverage-percent">—</strong></div>
-        <div class="track" role="progressbar" aria-label="Valid stocks as a share of total stocks" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="coverage-track"><div id="coverage-fill"></div></div>
-      </section>
-
-      <div class="content-grid">
-        <section class="panel results-panel" aria-labelledby="results-heading">
-          <div class="section-head">
-            <div><div class="section-kicker">TODAY'S SIGNALS</div><h2 id="results-heading">Stocks that passed</h2></div>
-            <span class="count-tag" id="result-badge">— stocks</span>
-          </div>
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th scope="col">STOCK</th><th scope="col" class="right">PRICE</th><th scope="col" class="right">VALUE MA5</th><th scope="col" class="right">RANGE 5D</th><th scope="col" class="right">EMA 10</th><th scope="col" class="right">EMA 20</th></tr></thead>
-              <tbody id="stocks-body"><tr><td colspan="6" class="empty-row">Loading scan data...</td></tr></tbody>
-            </table>
-          </div>
-          <div class="panel-foot"><span class="small-pulse"></span><span id="data-caption">Yahoo Finance IDX prices may be delayed 10 minutes.</span></div>
-        </section>
-
-        <aside class="side-column">
-          <section class="panel history-panel" aria-labelledby="history-heading">
-            <div class="section-head"><div><div class="section-kicker">PAST RESULTS</div><h2 id="history-heading">Scan history</h2></div></div>
-            <div class="chart-header"><span>Stocks passed each scan</span><span id="history-period">Last 7 scans</span></div>
-            <div class="bar-chart" id="history-bars" aria-label="Previous scan match counts"><p class="muted">Loading history...</p></div>
-            <div class="history-list" id="history-list"></div>
-          </section>
-
-          <section class="panel rules-panel" aria-labelledby="rules-heading">
-            <div class="section-head"><div><div class="section-kicker">OUR FILTER</div><h2 id="rules-heading">7 screening rules</h2></div></div>
-            <ol class="rules-list">
-              <li><span>01</span> Price ≥ Rp250</li>
-              <li><span>02</span> Price ≥ EMA 10</li>
-              <li><span>03</span> EMA 10 ≥ EMA 20</li>
-              <li><span>04</span> EMA 20 ≥ 5 days ago</li>
-              <li><span>05</span> Value MA5 ≥ Rp5B</li>
-              <li><span>06</span> Avg. daily range 5D ≥ 5%</li>
-              <li><span>07</span> Price ≤ MA20 + 5%</li>
-            </ol>
-          </section>
-        </aside>
+    <section class="results" aria-label="Latest screening results">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Stock</th>
+              <th scope="col" class="right">Price</th>
+              <th scope="col" class="right">Value MA5</th>
+              <th scope="col" class="right">Range 5D</th>
+              <th scope="col" class="right">EMA10</th>
+              <th scope="col" class="right">EMA20</th>
+              <th scope="col" class="right">MA20</th>
+            </tr>
+          </thead>
+          <tbody id="stocks-body"><tr><td colspan="7" class="empty">Loading results...</td></tr></tbody>
+        </table>
       </div>
-      <footer><span>IDX Pulse · Built with GitHub Pages</span><span>For research only · Yahoo Finance data may be delayed or incomplete</span></footer>
-    </main>
-  </div>
+    </section>
+
+    <footer>
+      <p id="last-update">Last update: Loading...</p>
+      <p class="footnote">Yahoo Finance data may be delayed. For research only.</p>
+    </footer>
+  </main>
 </body>
 </html>
