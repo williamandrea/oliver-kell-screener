@@ -1,0 +1,38 @@
+name: Daily IDX Scan
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 18 * * 1-5"
+      timezone: "Asia/Jakarta"
+permissions:
+  contents: write
+concurrency:
+  group: idx-daily-scan
+  cancel-in-progress: false
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install packages
+        run: pip install -r requirements.txt
+      - name: Test
+        run: python -m unittest discover -s tests -v
+      - name: Run screener
+        run: python screener.py
+      - name: Save history and stock list
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/stocks.csv history/
+          if ! git diff --cached --quiet; then
+            git commit -m "Save daily IDX scan results"
+            git push
+          fi

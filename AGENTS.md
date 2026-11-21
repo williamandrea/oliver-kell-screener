@@ -36,7 +36,7 @@ Rule 4 is only a **trading value estimate**, not official traded value. Do not s
 
 ## Current stage and status
 
-**Stage 1 deployed to GitHub; first live run failed on Saturday 2026-11-21.** Data downloads worked for 919/962 stocks, but the program expected Saturday prices. The weekend-date and missing-ticker fixes passed 10 local tests. The updated version is not yet live verified.
+**Stage 1 written, not yet tested end-to-end against live Yahoo Finance.** Local rule tests reportedly passed (5 tests) when initially created; rerun them after any changes. GitHub Actions has not yet been set up in the user's repository.
 
 Project files:
 
@@ -59,14 +59,14 @@ Current settings in `screener.py`: stock batches of 40, 3 months of daily prices
 - Running after market close does not guarantee Yahoo has updated every ticker; stale tickers are reported.
 - GitHub scheduled jobs may be delayed or skipped. Check logs.
 - History files are committed by Actions; keep the token permission `contents: write`.
-- On a market holiday, a run may use a recent prior trading day; if no recent or valid data exists, no history is saved.
+- On a market holiday, a run with no valid current data saves no scan history.
 - There is no live Yahoo end-to-end verification yet, and no Telegram or history web page yet.
 
 ## Next steps
 
-1. User uploads/replaces the changed files from the fix ZIP in the existing GitHub repo, preserving paths.
-2. User manually reruns GitHub Actions and checks saved history and missing reports.
-3. Address any remaining live-data problems before adding Telegram.
+1. User uploads the project files (including hidden `.github`) to a private GitHub repo.
+2. User enables GitHub Actions write permissions and runs the workflow manually.
+3. Check the first real scan for stock count, missing tickers, correct output, and reliability; fix issues found.
 4. Only then add Telegram, and later a history view, with user approval.
 
 ## Change log
@@ -77,15 +77,3 @@ Current settings in `screener.py`: stock batches of 40, 3 months of daily prices
 ## Rule for future agents
 
 For each project update: change code/docs as needed, run relevant tests, update the **Current stage**, **Known limits**, **Next steps**, and **Change log** in this file, and provide the updated project files/ZIP. Do not claim untested features work.
-
-## Live scan findings and fixes (2026-11-21)
-
-The first GitHub Actions manual run on Saturday 2026-11-21 loaded 962 symbols; Yahoo returned data for 919, while the scan failed because it required the last price date to equal Saturday. All original 5 tests passed. Yahoo gave no data for several symbols; this **does not prove delisting**. Node.js 20 deprecation warning came from `actions/checkout@v4` and `actions/setup-python@v5`.
-
-Fixes in this update:
-- Auto-select the most common recent stock trading date, within 7 calendar days, instead of assuming calendar today. `--date` still forces an expected date. Never save when no usable data.
-- Track **Yahoo download failures only** in `data/excluded_tickers.json`. Once a symbol fails 2 runs in a row, skip it for 30 days, then check it again. Remove it if data returns. Skipped symbols stay in missing reports. These are unavailable symbols, not confirmed deleted stocks.
-- Use `actions/checkout@v7` and `actions/setup-python@v7`, plus commit the exclusion file to GitHub.
-- Added tests for weekend dates, stale data, mixed data dates, missing-ticker handling, and batch data format.
-
-**Current stage:** Stage 1 is running on GitHub, but the first full run failed; fixes are unit-tested but **not yet live-tested** on GitHub. Next: user uploads the fix files, commits, re-runs the workflow and shares any new error logs. The 4 screening rules remain unchanged. Daily price caching and Telegram are still future features.

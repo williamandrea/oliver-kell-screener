@@ -1,7 +1,5 @@
 # Simple IDX Stock Screener
 
-**For future AI agents:** Read `AGENTS.md` first. Update it after every project change.
-
 Scans IDX stocks with free Yahoo Finance daily data. Saves daily matched stocks and scan status.
 
 ## Rules
@@ -57,13 +55,3 @@ A full scan downloads around 3 months for each stock in batches of 40. This firs
 - GitHub Actions free usage and write permission depend on repository/account settings.
 - Scheduled runs can fail. Check Actions logs regularly.
 - This stage does not send Telegram messages or show a history website.
-
-## Fixes after first live run (2026-11-21)
-
-- Weekend/manual runs now use the latest common trading day found in Yahoo data (within the last 7 calendar days), not today's calendar date. Use `--date YYYY-MM-DD` to check a specific day.
-- A missing Yahoo ticker is **not automatically called delisted**. After 2 failed daily downloads, it goes into `data/excluded_tickers.json` and is skipped for 30 days. It is then tried again. Recovered tickers are removed from the list.
-- Temporarily skipped and missing tickers are shown in the daily missing report. An old or incomplete price history does **not** place a ticker on the skip list.
-- Workflow uses Node.js 24-compatible `actions/checkout@v7` and `actions/setup-python@v7`.
-- If there are no recent market dates or none of the stocks have valid prices, the scan still stops rather than saving false history.
-
-To apply just the fix ZIP, extract it **over the existing project**, keeping its folders (especially `.github/workflows/`). Do not remove existing `history/` or `data/stocks.csv` files. Re-run **Actions > Daily IDX Scan > Run workflow** after committing the changes.

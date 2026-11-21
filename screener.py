@@ -8,7 +8,7 @@ import json
 import logging
 import re
 import time
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -18,8 +18,6 @@ import requests
 LOG = logging.getLogger("idx_screener")
 ROOT = Path(__file__).resolve().parent
 UNIVERSE_FILE = ROOT / "data" / "stocks.csv"
-EXCLUDED_FILE = ROOT / "data" / "excluded_tickers.json"
-EXCLUSION_DAYS = 30
 HISTORY = ROOT / "history"
 # Public, community-maintained list. Never silently scan a short or stale fallback list.
 STOCK_SOURCES = [
@@ -124,74 +122,6 @@ def fetch_prices(symbols: list[str], batch_size: int = BATCH_SIZE) -> tuple[dict
     return downloaded, missing
 
 
-def select_scan_date(prices: dict[str, pd.DataFrame], today: date) -> str:
-    """Use the latest common trading date, never a future or very old date."""
-    from collections import Counter
-    recent = Counter()
-    for frame in prices.values():
-        if frame.empty:
-            continue
-        last = pd.Timestamp(frame.index.max()).date()
-        if today - timedelta(days=7) <= last <= today:
-            recent[last] += 1
-    if not recent:
-        raise ValueError("No recent trading data available (within 7 days).")
-    # A single bad/latest tick should not set the date for the whole market.
-    chosen, count = max(recent.items(), key=lambda pair: (pair[1], pair[0]))
-    if count < max(1, len(prices) // 2):
-        raise ValueError("Stock dates disagree; cannot safely choose a scan date.")
-    return chosen.isoformat()
-
-
-def load_exclusions() -> dict:
-    if EXCLUDED_FILE.exists():
-        try:
-            data = json.loads(EXCLUDED_FILE.read_text(encoding="utf-8"))
-            if isinstance(data, dict):
-                return data
-        except (ValueError, OSError) as exc:
-            LOG.warning("Invalid exclusions file: %s", exc)
-    return {}
-
-
-def eligible_symbols(symbols: list[str], exclusions: dict, today: date) -> tuple[list[str], list[str]]:
-    active, skipped = [], []
-    for symbol in symbols:
-        record = exclusions.get(symbol, {})
-        if not isinstance(record, dict):
-            record = {}
-        until = record.get("retry_after", "")
-        # This is a temporary skip, not proof of delisting.
-        if until and until > today.isoformat():
-            skipped.append(symbol)
-        else:
-            active.append(symbol)
-    return active, skipped
-
-
-def update_exclusions(exclusions: dict, attempted: list[str], downloaded: dict,
-                      missing: list[str], today: date) -> dict:
-    result = dict(exclusions)
-    failures = set(missing)
-    for symbol in attempted:
-        if symbol in downloaded:
-            result.pop(symbol, None)
-        elif symbol in failures:
-            old = result.get(symbol, {})
-            count = int(old.get("consecutive_failures", 0)) + 1
-            item = {"reason": "Yahoo returned no price data; not confirmed delisted",
-                    "consecutive_failures": count, "last_checked": today.isoformat()}
-            if count >= 2:
-                item["retry_after"] = (today + timedelta(days=EXCLUSION_DAYS)).isoformat()
-            result[symbol] = item
-    return result
-
-
-def save_exclusions(data: dict) -> None:
-    EXCLUDED_FILE.parent.mkdir(parents=True, exist_ok=True)
-    EXCLUDED_FILE.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-
-
 def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]:
     """Return status ('passed', 'failed', 'invalid') and row, if passed."""
     if len(frame) < MIN_BARS:
@@ -223,7 +153,7 @@ def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]
     }
 
 
-def save_results(date: str, rows: list[dict], missing: list[str], total: int, valid: int, skipped: int = 0) -> None:
+def save_results(date: str, rows: list[dict], missing: list[str], total: int, valid: int) -> None:
     HISTORY.mkdir(parents=True, exist_ok=True)
     with (HISTORY / f"{date}.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["ticker", "price", "ema10", "ema20", "ema20_5d_ago", "value_ma20_idr"])
@@ -231,7 +161,7 @@ def save_results(date: str, rows: list[dict], missing: list[str], total: int, va
         writer.writerows(sorted(rows, key=lambda row: row["ticker"]))
     (HISTORY / f"{date}-missing.txt").write_text("\n".join(sorted(missing)) + ("\n" if missing else ""), encoding="utf-8")
     summary = {"date": date, "total_stocks": total, "valid_stocks": valid,
-               "passed": len(rows), "missing_or_invalid": len(missing), "temporarily_skipped": skipped,
+               "passed": len(rows), "missing_or_invalid": len(missing),
                "value_note": "Close times Yahoo volume: approximate daily traded value"}
     (HISTORY / f"{date}-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
@@ -241,13 +171,13 @@ def save_results(date: str, rows: list[dict], missing: list[str], total: int, va
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simple daily IDX stock screener")
-    parser.add_argument("--date", help="Force trading date YYYY-MM-DD (default: detect automatically)")
+    parser.add_argument("--date", default=datetime.now(LOCAL_TZ).strftime("%Y-%m-%d"),
+                        help="Expected last trading date YYYY-MM-DD (default: today Jakarta)")
     parser.add_argument("--no-refresh", action="store_true", help="Use saved stock list")
     parser.add_argument("--tickers", help="Test a few codes, e.g. BBCA,BBRI,TLKM (no full scan)")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    if args.date:
-        datetime.strptime(args.date, "%Y-%m-%d")
+    datetime.strptime(args.date, "%Y-%m-%d")
     if args.tickers:
         codes = sorted({x.strip().upper().removesuffix(".JK") for x in args.tickers.split(",") if x.strip()})
         if any(not re.fullmatch(r"[A-Z]{4}", code) for code in codes):
@@ -257,23 +187,13 @@ def main() -> None:
     else:
         codes = load_universe(refresh=not args.no_refresh)
         persist = True
-    today = datetime.now(LOCAL_TZ).date()
     symbols = [code + ".JK" for code in codes]
-    exclusions = load_exclusions() if persist else {}
-    attempted, skipped = eligible_symbols(symbols, exclusions, today)
-    if skipped:
-        LOG.info("Temporarily skipped %d unavailable tickers (will recheck later)", len(skipped))
-    prices, failed = fetch_prices(attempted)
-    try:
-        scan_date = args.date or select_scan_date(prices, today)
-    except ValueError as exc:
-        raise SystemExit(f"{exc} No history saved.") from exc
-    LOG.info("Scanning latest trading date: %s", scan_date)
-    invalid = list(failed) + skipped
+    prices, failed = fetch_prices(symbols)
+    invalid = list(failed)
     rows = []
     valid = 0
     for symbol, frame in prices.items():
-        status, row = screen_stock(frame, scan_date)
+        status, row = screen_stock(frame, args.date)
         if status == "invalid":
             invalid.append(symbol)
         else:
@@ -282,18 +202,13 @@ def main() -> None:
                 row["ticker"] = symbol.removesuffix(".JK")
                 rows.append(row)
     if valid == 0:
-        raise SystemExit("No valid stock data for this trading date. No history saved.")
+        raise SystemExit("No valid stock data for this date. No history saved (holiday, data delay, or source error).")
     if persist:
-        # Only missing DOWNLOADS count toward temporary skipping; old prices and
-        # low-volume/short-history stocks must not be considered delisted.
-        updated = update_exclusions(exclusions, attempted, prices, failed, today)
-        save_exclusions(updated)
-        save_results(scan_date, rows, sorted(set(invalid)), len(codes), valid, len(skipped))
+        save_results(args.date, rows, invalid, len(codes), valid)
     else:
-        print(f"Test scan ({scan_date}): {valid}/{len(codes)} valid; {len(rows)} passed; {len(invalid)} missing")
+        print(f"Test scan: {valid}/{len(codes)} valid; {len(rows)} passed; {len(invalid)} missing")
         for row in rows:
             print(row)
-
 
 
 if __name__ == "__main__":
