@@ -1,217 +1,260 @@
 {
   "ARMY.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "BTEL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "CBMF.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "COWL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "CPRI.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "DUCK.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "ENVY.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "GAMA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "GOLL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "HKMU.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "HOME.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "HOTL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "IIKP.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "JSKY.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "KBRI.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "LCGP.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "LMAS.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "MABA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "MAGP.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "META.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "MTRA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "NUSA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "OCAP.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "PLAS.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "POOL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "POSA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "PURE.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "RIMO.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SBAT.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SCPI.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SIMA.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SKYB.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SMRU.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SRIL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "SUGI.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TDPM.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TECH.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TOYS.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TRAM.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TRIL.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "TRIO.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "UNIT.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   },
   "WSKT.JK": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 2,
     "last_checked": "2026-11-21",
-    "reason": "Yahoo returned no price data; not confirmed delisted"
+    "reason": "Yahoo returned no price data; not confirmed delisted",
+    "retry_after": "2026-12-21"
   }
 }
