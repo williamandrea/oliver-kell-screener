@@ -16,7 +16,7 @@ A stock passes only when all seven rules are true:
 6. Average daily range for 5 trading days >= 5%, where each day's range is `(High - Low) / Low * 100`
 7. Last close <= 1.05 * MA 20 (simple average of the last 20 closes). A price below MA 20 is allowed.
 
-**Note:** Rule 4 is an **estimate** of trading value, not actual exchange-recorded turnover. Yahoo volume and raw closing price are used.
+**Note:** Rule 5 is an **estimate** of trading value, not actual exchange-recorded turnover. Yahoo volume and raw closing price are used.
 
 ## Start using GitHub (no server)
 
@@ -76,3 +76,16 @@ To apply just the fix ZIP, extract it **over the existing project**, keeping its
 The screener now uses 7 rules. Output CSV columns: `ticker`, `price`, `ema10`, `ema20`, `ema20_5d_ago`, `value_ma5_idr`, `avg_range_5d_pct`, and `ma20`. The old `value_ma20_idr` output was replaced.
 
 `High` and `Low` are required from Yahoo Finance. Stocks with missing or invalid fields are reported as invalid, not failed. The GitHub Actions schedule is unchanged.
+
+## Stage 2: public dashboard (GitHub Pages)
+
+The simple dark website lives in `docs/`. It shows the latest scan, passing stocks, and earlier scan dates. There is no search, CSV download, server, login, or third-party CSS/JavaScript service.
+
+1. Keep running the existing **Daily IDX Scan** workflow; it now also runs `python build_site.py` and commits generated files under `docs/data/`.
+2. Make the GitHub repository **Public** (Settings -> General -> Change repository visibility). **Warning:** all code and committed scan history become public. Check there are no secrets in the repository before changing visibility.
+3. Go to **Settings -> Pages**. Under **Build and deployment**, choose **Deploy from a branch**, select **main** and **/docs**, then save.
+4. Run **Actions -> Daily IDX Scan -> Run workflow** once to publish data. GitHub Pages then publishes the website. Find the URL in Settings -> Pages, normally `https://YOUR-USERNAME.github.io/YOUR-REPO/`.
+
+If the site says *No published scans yet*, check that `docs/data/manifest.json` lists scan dates. You can also run `python build_site.py` locally to rebuild site data from saved `history/`. Old saved scans may use older screening rules, and the site marks them as such.
+
+**Data safety:** the site only reads static JSON built from the CSV history. No API keys or private data are needed in the browser. The website uses no external scripts. GitHub Pages is public; don't store credentials in tracked files.

@@ -34,7 +34,7 @@ Trading value is an estimate, not the exchange's official reported turnover.
 - Download market data in batches and retry failures.
 - Skip and report stocks with missing, outdated, or unusable price data; do not assume they failed the rules.
 - Run automatically on GitHub Actions on weekdays, after market close in Jakarta.
-- Stage 1: daily scan + saved CSV history. Stage 2: Telegram notifications. Stage 3: history view.
+- Stage 1: daily scan + saved CSV history. Stage 2: public static history website on GitHub Pages (now built). Telegram alerts are optional later.
 - Private GitHub repository preferred. User must upload/push project files; the AI in this Temporary Chat cannot push directly.
 
 ## Current stage and status
@@ -101,3 +101,16 @@ Fixes in this update:
 - `README.md`: updated rules and output format.
 - `.github/workflows/daily.yml` unchanged. Current user report: GitHub workflow has already succeeded under the previous four-rule version. The seven-rule update is **not yet verified on GitHub**.
 - **Next:** upload changed files preserving paths; run workflow manually and inspect `history/` CSV and summary; then discuss Telegram alerts.
+
+## Latest change (2026-11-21): Stage 2 public static dashboard
+
+User approved a dark, mobile-friendly website styled like the second design reference. **No search box and no CSV download buttons.** Public site approved. Code quality goals: simple, fast, safe, easy to maintain.
+
+- Added `docs/index.html`, `docs/assets/styles.css`, `docs/assets/app.js`, `docs/assets/icon.svg`, and `docs/.nojekyll` for a plain static site without external JavaScript/CSS libraries or server.
+- Added `build_site.py` to turn `history/YYYY-MM-DD.csv` and summary files into `docs/data/manifest.json` and per-date JSON. Data is checked before publishing. Site does not show invented sample stock results; no history means a clear empty state.
+- Updated `.github/workflows/daily.yml` to build and commit website JSON after a successful scan. Daily scan schedule and seven screening rules are unchanged.
+- Added `tests/test_build_site.py`. **21 local unit tests passed** (16 previous + 5 new). Full GitHub Pages deployment has not been verified.
+- README explains how to set GitHub repo **Public** and enable Pages from `main` and `/docs`. Check for accidentally committed secrets before publishing the repo; all history becomes public.
+- Website shows latest results, passing stocks, 7 rules, and history by day. It does **not** show Telegram alerts, offer search, or provide CSV download buttons.
+
+**Next:** Apply the new/changed files to the GitHub repository, commit, set repository Public, enable Pages `main` `/docs`, run scan once, check deployed URL on desktop/mobile. If successful, consider Telegram alerts only if user wants them.
