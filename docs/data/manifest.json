@@ -3,6 +3,8 @@
   "scans": [
     {
       "date": "2026-11-20",
+      "scan_id": "2026-11-20",
+      "scanned_at": "",
       "passed": 2,
       "valid": 916,
       "total": 962,
