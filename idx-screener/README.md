@@ -1,7 +1,5 @@
 # Simple IDX Stock Screener
 
-**For future AI agents:** Read `AGENTS.md` first. Update it after every project change.
-
 Scans IDX stocks with free Yahoo Finance daily data. Saves daily matched stocks and scan status.
 
 ## Rules
