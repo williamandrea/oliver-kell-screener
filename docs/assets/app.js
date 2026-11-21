@@ -74,6 +74,58 @@ function scanTime(scan, scanId) {
   return scanId.length === 15 ? `${formatted}, ${scanId.slice(-4, -2)}:${scanId.slice(-2)} WIB` : `${formatted} (time unavailable)`;
 }
 
+// A scan becomes late only after the next scheduled scan has had 90 minutes
+// to finish. Weekends have no scheduled scans.
+function latestDueScan(now) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23", weekday: "short"
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  const day = `${values.year}-${values.month}-${values.day}`;
+  const slots = values.weekday === "Fri" ? ["09:45", "14:45", "15:45", "18:45"]
+    : ["Mon", "Tue", "Wed", "Thu"].includes(values.weekday)
+      ? ["09:45", "13:45", "15:45", "18:45"] : [];
+  // Asia/Jakarta is UTC+7 year-round. Allow 90 minutes for GitHub delays.
+  for (const slot of slots.slice().reverse()) {
+    const dueAt = new Date(`${day}T${slot}:00+07:00`);
+    if (now.getTime() >= dueAt.getTime() + 90 * 60_000) return dueAt;
+  }
+  return null;
+}
+
+function scanTimestamp(scan, scanId) {
+  if (typeof scan.scanned_at === "string" && scan.scanned_at.trim()) {
+    const value = Date.parse(scan.scanned_at);
+    if (Number.isFinite(value)) return value;
+  }
+  if (scanId.length === 15) {
+    const clock = scanId.slice(11);
+    const value = Date.parse(`${scanId.slice(0, 10)}T${clock.slice(0, 2)}:${clock.slice(2)}:00+07:00`);
+    if (Number.isFinite(value)) return value;
+  }
+  // Old daily scans have no clock: treat them as end-of-day results.
+  const value = Date.parse(`${scanId.slice(0, 10)}T23:59:59+07:00`);
+  return Number.isFinite(value) ? value : NaN;
+}
+
+function warningMessages(scan, scanId, now = new Date()) {
+  const warnings = [];
+  const last = scanTimestamp(scan, scanId);
+  const due = latestDueScan(now);
+  if (!Number.isFinite(last) || now.getTime() - last > 7 * 86_400_000 ||
+      (due && last < due.getTime())) {
+    warnings.push("Latest results may be old. The most recent scheduled scan has not been published.");
+  }
+  const total = Number(scan.summary?.total_stocks);
+  const missing = Number(scan.summary?.missing_or_invalid);
+  if (Number.isInteger(total) && total > 0 && Number.isInteger(missing) &&
+      missing >= 0 && missing / total >= 0.10) {
+    warnings.push(`Incomplete scan: ${number.format(missing)} of ${number.format(total)} stocks (${decimal.format(missing / total * 100)}%) had missing or unusable data.`);
+  }
+  return warnings;
+}
+
 async function start() {
   try {
     const manifest = await loadJSON("data/manifest.json");
@@ -90,7 +142,9 @@ async function start() {
     }
     showStocks(scan.stocks);
     lastUpdate.textContent = `Last update: ${scanTime(scan, scanId)}`;
-    if (scan.rules_version < 2) showMessage("This result uses older screening rules.");
+    const warnings = warningMessages(scan, scanId);
+    if (scan.rules_version < 2) warnings.unshift("This result uses older screening rules.");
+    showMessage(warnings.join(" "));
   } catch (error) {
     console.error("Unable to show scan:", error);
     body.replaceChildren();

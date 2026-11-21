@@ -101,3 +101,14 @@ Each run writes a different file, for example `history/2026-11-23-0945.csv` and 
 **To check a missing ticker:** Run `python screener.py --tickers BRIS,PKPK`. It prints which rules failed if Yahoo returns usable data. The site only shows stocks that pass **all seven rules**, so a working website doesn't guarantee BRIS or PKPK will appear.
 
 **If website says no data:** Check `docs/data/manifest.json` in the GitHub repository. It should list saved scans. Run the workflow to rebuild the file, then wait for GitHub Pages to publish it. The webpage reads this file; without it no stocks can display.
+
+## Website data warnings
+
+The simple public website keeps showing matching stocks when there is a data warning:
+
+- **Old results:** Warn if a scheduled weekday scan is still missing **90 minutes** after its planned time, using Jakarta time. Fridays use 14:45 for the second scan. Weekends do not require a new scan. A scan over 7 days old also warns.
+- **Missing data:** Warn when **10% or more** of stocks in the latest scan have missing or unusable data. The count comes from the saved scan summary.
+
+Warnings are shown above the results table. They do not change the seven screening rules. No alert is displayed when everything is healthy. The static page does not send notifications.
+
+To test the website warning logic locally, run `node tests/test_site_warnings.js`. Other tests use `python -m unittest discover -s tests -v`.

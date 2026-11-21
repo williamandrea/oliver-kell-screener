@@ -125,9 +125,13 @@ User approved a dark, mobile-friendly website styled like the second design refe
 - User's published website is https://williamandrea.github.io/oliver-kell-screener/. Its HTML was accessible, but live `docs/data/manifest.json` could **not** be read with available tools. Therefore, the exact reason BRIS and PKPK were missing was **not confirmed**. Possible reasons: published manifest is missing/stale or one or more stock rules failed. Never add these stocks to passing results without checking all 7 rules. After upload, verify site `data/manifest.json` and run `python screener.py --tickers BRIS,PKPK` locally.
 - New local tests cover separate scan files and multiple scans per date. Next: upload changed files preserving folder paths, manually run one GitHub workflow, inspect output and confirm site displays a time and any matching stocks. If Yahoo daily bars do not update within the trading session, consider using Yahoo intraday bars to build today's candle.
 
-## Latest change (2026-11-21): simpler website
+## Latest change (2026-11-21): website data-health warnings and mobile cleanup
 
-- User requested only four sections, in this order: `Oliver Kell Screener` title, short seven-rule summary, latest passing-stock table, and last update time.
-- Removed dashboard cards, charts, history controls, and extra header elements from the website. Kept dark mobile-friendly styling.
-- `docs/assets/app.js` still reads the newest scan from `docs/data/manifest.json` and shows safe plain text, including an empty/error state. Earlier history files remain saved and unchanged.
-- No screener rules, schedules, or GitHub Actions files changed. After publishing, check the latest table and timestamp on GitHub Pages.
+- User confirmed the public website already displays correct scan data. No changes to screener rules, scan times, GitHub workflow, or Telegram (do not add Telegram).
+- Keep the **simple** website layout: title **Oliver Kell Screener**, one short paragraph with 7 rules, latest results table, last-update line. No search/download/history controls.
+- `docs/assets/app.js` now shows a warning when the last published scan missed the most recent expected weekday run by 90 minutes. It uses WIB and the Friday 14:45 schedule. No warning just because it's Saturday or Sunday; scans over 7 days old still warn.
+- Website warns if at least **10% of total listed stocks** have missing or unusable data in the latest scan, using the saved summary values. This is a warning, not a filter; matching stocks still display.
+- `docs/assets/styles.css` improves mobile table scrolling, readability of rules and values, and emphasis on last update. No new UI frameworks or external scripts.
+- `tests/test_site_warnings.js` checks schedule, weekends, Friday times, and missing-data threshold. Run with `node tests/test_site_warnings.js` (Node.js built-in tools only).
+- Checks: 23 Python tests and 9 website warning checks passed locally. Production GitHub Pages has **not** been retested after this change.
+- **Next:** overwrite the changed files in the repo (preserve directory structure), commit and push; load the public website. Warnings appear only if data becomes late/incomplete, so a healthy scan shows no warning.
