@@ -6,7 +6,10 @@ const compact = new Intl.NumberFormat("en-US", { notation: "compact", maximumFra
 const percent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const manifestPath = "data/manifest.json";
 let allScans = [];
-let selectedDate = null;
+let selectedScan = null;
+const validScanId = (value) => /^\d{4}-\d{2}-\d{2}(?:-\d{4})?$/.test(value);
+const scanIdOf = (item) => item.scan_id || item.date;
+const scanLabel = (item) => `${friendlyDate(item.date)}${item.scan_id && item.scan_id.length > 10 ? ` · ${item.scan_id.slice(-4, -2)}:${item.scan_id.slice(-2)} WIB` : " · daily"}`;
 
 function friendlyDate(iso) {
   const parts = iso.split("-").map(Number);
@@ -46,7 +49,7 @@ function renderSummary(scan) {
   $("coverage-fill").style.width = `${safeRate}%`;
   $("coverage-track").setAttribute("aria-valuenow", String(Math.round(safeRate)));
   setText("result-badge", `${scan.stocks.length} stocks`);
-  setText("data-caption", scan.rules_version < 2 ? "Older results may use previous screening rules." : "Results use daily closing prices, not live prices.");
+  setText("data-caption", scan.rules_version < 2 ? "Older results may use previous screening rules." : "Uses latest available Yahoo daily prices; market data may be delayed 10 minutes.");
 }
 
 function renderStocks(stocks) {
@@ -86,13 +89,13 @@ function renderHistory() {
   const history = $("history-list");
   history.replaceChildren();
   for (const item of allScans.slice(0, 6)) {
-    const button = el("button", `history-button${selectedDate === item.date ? " active" : ""}`);
+    const button = el("button", `history-button${selectedScan === scanIdOf(item) ? " active" : ""}`);
     button.type = "button";
-    button.setAttribute("aria-label", `View ${friendlyDate(item.date)} scan, ${item.passed} stocks matched`);
+    button.setAttribute("aria-label", `View ${scanLabel(item)} scan, ${item.passed} stocks matched`);
     const left = el("span");
-    left.append(el("span", "", friendlyDate(item.date)), el("small", "", `${number.format(item.valid)} valid stocks`));
+    left.append(el("span", "", scanLabel(item)), el("small", "", `${number.format(item.valid)} valid stocks`));
     button.append(left, el("strong", "", String(item.passed)));
-    button.addEventListener("click", () => selectDate(item.date));
+    button.addEventListener("click", () => selectScan(scanIdOf(item)));
     history.append(button);
   }
   const chart = $("history-bars");
@@ -101,30 +104,30 @@ function renderHistory() {
   if (!lastSeven.length) { chart.append(el("p", "muted", "No history yet.")); return; }
   const max = Math.max(1, ...lastSeven.map((item) => item.passed));
   for (const item of lastSeven) {
-    const bar = el("div", `bar-item${item.date === selectedDate ? " selected" : ""}`);
+    const bar = el("div", `bar-item${scanIdOf(item) === selectedScan ? " selected" : ""}`);
     const barFill = el("div", "bar-fill");
     barFill.style.height = `${Math.max(3, Math.round(item.passed / max * 82))}%`;
-    bar.append(el("span", "bar-count", String(item.passed)), barFill, el("span", "bar-label", shortDate(item.date)));
-    bar.title = `${friendlyDate(item.date)}: ${item.passed} matched`;
+    bar.append(el("span", "bar-count", String(item.passed)), barFill, el("span", "bar-label", item.scan_id && item.scan_id.length > 10 ? `${item.scan_id.slice(-4,-2)}:${item.scan_id.slice(-2)}` : shortDate(item.date)));
+    bar.title = `${scanLabel(item)}: ${item.passed} matched`;
     chart.append(bar);
   }
 }
 
-async function selectDate(day) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !allScans.some((item) => item.date === day)) return;
-  selectedDate = day;
-  $("scan-date").value = day;
+async function selectScan(scanId) {
+  if (!validScanId(scanId) || !allScans.some((item) => scanIdOf(item) === scanId)) return;
+  selectedScan = scanId;
+  $("scan-date").value = scanId;
   renderHistory();
   showNotice("");
   try {
-    const scan = await getJSON(`data/${day}.json`);
-    if (selectedDate !== day) return;
-    if (scan.date !== day || !Array.isArray(scan.stocks) || !scan.summary) throw new Error("Invalid scan data");
+    const scan = await getJSON(`data/${scanId}.json`);
+    if (selectedScan !== scanId) return;
+    if (scanIdOf(scan) !== scanId || !Array.isArray(scan.stocks) || !scan.summary) throw new Error("Invalid scan data");
     renderSummary(scan);
     renderStocks(scan.stocks);
     if (scan.rules_version < 2) showNotice("This older scan used earlier screening rules. Compare results with care.");
   } catch (error) {
-    if (selectedDate === day) {
+    if (selectedScan === scanId) {
       showNotice("Could not load this day's results. Please refresh and try again.");
       console.error("Scan data error:", error);
     }
@@ -135,7 +138,7 @@ async function start() {
   try {
     const manifest = await getJSON(manifestPath);
     if (!Array.isArray(manifest.scans)) throw new Error("Invalid history list");
-    allScans = manifest.scans.filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(item.date));
+    allScans = manifest.scans.filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(item.date) && validScanId(scanIdOf(item)));
     const picker = $("scan-date");
     picker.replaceChildren();
     if (!allScans.length) {
@@ -146,15 +149,15 @@ async function start() {
       return;
     }
     for (const item of allScans) {
-      const option = el("option", "", friendlyDate(item.date));
-      option.value = item.date;
+      const option = el("option", "", scanLabel(item));
+      option.value = scanIdOf(item);
       picker.append(option);
     }
     picker.disabled = false;
-    picker.addEventListener("change", (event) => selectDate(event.target.value));
-    await selectDate(manifest.latest && allScans.some((item) => item.date === manifest.latest) ? manifest.latest : allScans[0].date);
+    picker.addEventListener("change", (event) => selectScan(event.target.value));
+    await selectScan(manifest.latest && allScans.some((item) => scanIdOf(item) === manifest.latest) ? manifest.latest : scanIdOf(allScans[0]));
   } catch (error) {
-    showNotice("Could not load scan history. Please refresh or check the published site data.");
+    showNotice("Scan data is not published yet. Check docs/data/manifest.json in GitHub and run the scan workflow again.");
     setText("history-period", "Unavailable");
     console.error("Manifest error:", error);
   }

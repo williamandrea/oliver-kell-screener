@@ -1,8 +1,8 @@
 import unittest
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 from screener import (parse_stock_list, screen_stock, select_scan_date,
-                      eligible_symbols, update_exclusions, split_download)
+                      eligible_symbols, update_exclusions, split_download, save_results)
 
 
 def sample_frame(last="2026-11-20", start=1000, step=2, volume=10_000_000,
@@ -87,6 +87,17 @@ class WorkflowFixTests(unittest.TestCase):
         self.assertEqual(eligible_symbols([symbol], second, date(2026, 12, 22))[0], [symbol])
         recovered = update_exclusions(second, [symbol], {symbol: sample_frame("2026-12-22")}, [], date(2026, 12, 22))
         self.assertNotIn(symbol, recovered)
+
+    def test_separate_scan_files(self):
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            with patch("screener.HISTORY", Path(tmp)):
+                save_results("2026-11-20", [], [], 900, 900, scanned_at=datetime.fromisoformat("2026-11-20T09:45:00+07:00"))
+                save_results("2026-11-20", [], [], 900, 900, scanned_at=datetime.fromisoformat("2026-11-20T18:45:00+07:00"))
+                self.assertTrue((Path(tmp) / "2026-11-20-0945.csv").exists())
+                self.assertTrue((Path(tmp) / "2026-11-20-1845-summary.json").exists())
 
     def test_batch_split(self):
         frame = sample_frame()

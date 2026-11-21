@@ -195,7 +195,7 @@ def save_exclusions(data: dict) -> None:
     EXCLUDED_FILE.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]:
+def screen_stock(frame: pd.DataFrame, scan_date: str, *, explain: bool = False) -> tuple[str, dict | None]:
     """Return status ('passed', 'failed', 'invalid') and row, if passed."""
     if len(frame) < MIN_BARS:
         return "invalid", None
@@ -223,12 +223,20 @@ def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]
     current_ema10 = float(ema10.iloc[-1])
     current_ema20 = float(ema20.iloc[-1])
     old_ema20 = float(ema20.iloc[-6])  # 5 trading sessions ago
-    passed = (price >= PRICE_MIN
-              and price >= current_ema10 >= current_ema20 >= old_ema20
-              and value_ma5 >= VALUE_MIN
-              and range_5d_pct >= RANGE_MIN_PCT
-              and price <= float(ma20) * MAX_ABOVE_MA20)
-    if not passed:
+    checks = {
+        "Price >= 250": price >= PRICE_MIN,
+        "Price >= EMA10": price >= current_ema10,
+        "EMA10 >= EMA20": current_ema10 >= current_ema20,
+        "EMA20 >= 5-day-old EMA20": current_ema20 >= old_ema20,
+        "Value MA5 >= Rp5B": value_ma5 >= VALUE_MIN,
+        "Range 5D >= 5%": range_5d_pct >= RANGE_MIN_PCT,
+        "Price <= MA20 + 5%": price <= float(ma20) * MAX_ABOVE_MA20,
+    }
+    if not all(checks.values()):
+        if explain:
+            print("  Failed: " + "; ".join(name for name, ok in checks.items() if not ok))
+            print(f"  Price={price:.2f}; EMA10={current_ema10:.2f}; EMA20={current_ema20:.2f}; "
+                  f"Value MA5=Rp{value_ma5:,.0f}; Range 5D={range_5d_pct:.2f}%; MA20={ma20:.2f}")
         return "failed", None
     return "passed", {
         "ticker": "", "price": round(price, 2), "ema10": round(current_ema10, 2),
@@ -239,19 +247,21 @@ def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]
     }
 
 
-def save_results(date: str, rows: list[dict], missing: list[str], total: int, valid: int, skipped: int = 0) -> None:
+def save_results(date: str, rows: list[dict], missing: list[str], total: int, valid: int, skipped: int = 0, scanned_at: datetime | None = None) -> None:
     HISTORY.mkdir(parents=True, exist_ok=True)
-    with (HISTORY / f"{date}.csv").open("w", newline="", encoding="utf-8") as handle:
+    stamp = scanned_at or datetime.now(LOCAL_TZ)
+    scan_id = f"{date}-{stamp.strftime('%H%M')}"
+    with (HISTORY / f"{scan_id}.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["ticker", "price", "ema10", "ema20", "ema20_5d_ago", "value_ma5_idr", "avg_range_5d_pct", "ma20"])
         writer.writeheader()
         writer.writerows(sorted(rows, key=lambda row: row["ticker"]))
-    (HISTORY / f"{date}-missing.txt").write_text("\n".join(sorted(missing)) + ("\n" if missing else ""), encoding="utf-8")
-    summary = {"date": date, "total_stocks": total, "valid_stocks": valid,
+    (HISTORY / f"{scan_id}-missing.txt").write_text("\n".join(sorted(missing)) + ("\n" if missing else ""), encoding="utf-8")
+    summary = {"date": date, "scan_id": scan_id, "scanned_at": stamp.isoformat(timespec="seconds"), "total_stocks": total, "valid_stocks": valid,
                "passed": len(rows), "missing_or_invalid": len(missing), "temporarily_skipped": skipped,
                "value_note": "5-day mean of close times Yahoo volume: approximate daily traded value",
                "range_note": "5-day mean of (High - Low) / Low * 100",
                "rules_version": 2}
-    (HISTORY / f"{date}-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    (HISTORY / f"{scan_id}-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
     if rows:
         print("Matched: " + ", ".join(sorted(r["ticker"] for r in rows)))
@@ -260,6 +270,7 @@ def save_results(date: str, rows: list[dict], missing: list[str], total: int, va
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simple daily IDX stock screener")
     parser.add_argument("--date", help="Force trading date YYYY-MM-DD (default: detect automatically)")
+    parser.add_argument("--require-today", action="store_true", help="Skip saving when today has no current trading data (scheduled runs)")
     parser.add_argument("--no-refresh", action="store_true", help="Use saved stock list")
     parser.add_argument("--tickers", help="Test a few codes, e.g. BBCA,BBRI,TLKM (no full scan)")
     args = parser.parse_args()
@@ -287,11 +298,18 @@ def main() -> None:
     except ValueError as exc:
         raise SystemExit(f"{exc} No history saved.") from exc
     LOG.info("Scanning latest trading date: %s", scan_date)
+    if args.require_today and (today.weekday() >= 5 or scan_date != today.isoformat()):
+        LOG.info("Market closed or no fresh trading data for today (%s). Skipping, no history saved.", today)
+        return
     invalid = list(failed) + skipped
     rows = []
     valid = 0
     for symbol, frame in prices.items():
-        status, row = screen_stock(frame, scan_date)
+        if not persist:
+            print(f"{symbol}: ", end="")
+        status, row = screen_stock(frame, scan_date, explain=not persist)
+        if not persist:
+            print(status)
         if status == "invalid":
             invalid.append(symbol)
         else:

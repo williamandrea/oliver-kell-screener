@@ -89,3 +89,15 @@ The simple dark website lives in `docs/`. It shows the latest scan, passing stoc
 If the site says *No published scans yet*, check that `docs/data/manifest.json` lists scan dates. You can also run `python build_site.py` locally to rebuild site data from saved `history/`. Old saved scans may use older screening rules, and the site marks them as such.
 
 **Data safety:** the site only reads static JSON built from the CSV history. No API keys or private data are needed in the browser. The website uses no external scripts. GitHub Pages is public; don't store credentials in tracked files.
+
+## Four scans per trading day (November 2026 update)
+
+Runs at **09:45, 13:45, 15:45, 18:45 WIB** Monday–Thursday. Friday: **09:45, 14:45, 15:45, 18:45 WIB**. GitHub Actions can start late. No run is scheduled on weekends. A run without daily prices stamped for today saves nothing (e.g. on IDX holidays).
+
+The Yahoo Finance Indonesia Stock Exchange (`.JK`) quote delay is listed as **10 minutes**. We use Yahoo's latest available **daily** candle during the day. It can be unfinished and change as more trades occur, so early results are **not final closing signals**. Intraday freshness depends on Yahoo's daily candle updates; no guarantee of exactly 10 minutes for the daily endpoint.
+
+Each run writes a different file, for example `history/2026-11-23-0945.csv` and `history/2026-11-23-1845.csv`. The website lets you choose each scan, and old daily results still work. The saved scan time is the actual scan completion time, so delayed runs can show a slightly different time.
+
+**To check a missing ticker:** Run `python screener.py --tickers BRIS,PKPK`. It prints which rules failed if Yahoo returns usable data. The site only shows stocks that pass **all seven rules**, so a working website doesn't guarantee BRIS or PKPK will appear.
+
+**If website says no data:** Check `docs/data/manifest.json` in the GitHub repository. It should list saved scans. Run the workflow to rebuild the file, then wait for GitHub Pages to publish it. The webpage reads this file; without it no stocks can display.

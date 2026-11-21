@@ -114,3 +114,13 @@ User approved a dark, mobile-friendly website styled like the second design refe
 - Website shows latest results, passing stocks, 7 rules, and history by day. It does **not** show Telegram alerts, offer search, or provide CSV download buttons.
 
 **Next:** Apply the new/changed files to the GitHub repository, commit, set repository Public, enable Pages `main` `/docs`, run scan once, check deployed URL on desktop/mobile. If successful, consider Telegram alerts only if user wants them.
+
+## Latest change (2026-11-21): 4 weekday scans and website diagnosis
+
+- The user approved automatic runs at 09:45, 13:45, 15:45, 18:45 WIB Monday–Thursday; Friday second scan is 14:45 WIB. Same 7 rules.
+- Yahoo officially lists **10-minute delayed quotes** for Indonesian `.JK` stocks; daily OHLCV may update at different times. Current-day bars are **unfinished** during trading and screening results can change by the final scan.
+- `.github/workflows/daily.yml` runs four times weekdays with Asia/Jakarta timezone, invoking `screener.py --require-today` to avoid re-saving prior days on holidays/weekends. Delayed GitHub schedules may start late.
+- `screener.py` saves each scan separately under `history/YYYY-MM-DD-HHMM.*` using actual Jakarta scan time. Old daily `history/YYYY-MM-DD.*` records remain supported. `--tickers BRIS,PKPK` prints failing rule names for debugging.
+- `build_site.py` now produces one JSON per scan and a manifest sorted by scan time. `docs/assets/app.js` displays every scan time and can load both old daily and new time-stamped files. `docs/index.html` labels scan times and warns prices may be delayed.
+- User's published website is https://williamandrea.github.io/oliver-kell-screener/. Its HTML was accessible, but live `docs/data/manifest.json` could **not** be read with available tools. Therefore, the exact reason BRIS and PKPK were missing was **not confirmed**. Possible reasons: published manifest is missing/stale or one or more stock rules failed. Never add these stocks to passing results without checking all 7 rules. After upload, verify site `data/manifest.json` and run `python screener.py --tickers BRIS,PKPK` locally.
+- New local tests cover separate scan files and multiple scans per date. Next: upload changed files preserving folder paths, manually run one GitHub workflow, inspect output and confirm site displays a time and any matching stocks. If Yahoo daily bars do not update within the trading session, consider using Yahoo intraday bars to build today's candle.

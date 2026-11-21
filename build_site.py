@@ -11,7 +11,7 @@ import re
 ROOT = Path(__file__).resolve().parent
 HISTORY = ROOT / "history"
 OUTPUT = ROOT / "docs" / "data"
-DATE_FILE = re.compile(r"^(\d{4}-\d{2}-\d{2})-summary\.json$")
+DATE_FILE = re.compile(r"^(\d{4}-\d{2}-\d{2})(?:-(\d{4}))?-summary\.json$")
 FIELDS = ("ticker", "price", "ema10", "ema20", "ema20_5d_ago", "value_ma5_idr", "avg_range_5d_pct", "ma20")
 NUMBER_FIELDS = FIELDS[1:]
 
@@ -31,7 +31,7 @@ def parse_day(value: str) -> str:
     return value
 
 
-def read_scan(csv_path: Path, summary_path: Path, day: str) -> dict:
+def read_scan(csv_path: Path, summary_path: Path, day: str, scan_id: str) -> dict:
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     if summary.get("date") != day:
         raise ValueError("Summary date mismatch")
@@ -62,7 +62,7 @@ def read_scan(csv_path: Path, summary_path: Path, day: str) -> dict:
     if len(stocks) != totals["passed"]:
         raise ValueError("Passed count does not match CSV")
     stocks.sort(key=lambda row: row["ticker"])
-    return {"date": day, "rules_version": as_count(summary.get("rules_version", 1)),
+    return {"date": day, "scan_id": scan_id, "scanned_at": summary.get("scanned_at", ""), "rules_version": as_count(summary.get("rules_version", 1)),
             "summary": {**totals, "temporarily_skipped": as_count(summary.get("temporarily_skipped", 0))},
             "stocks": stocks}
 
@@ -76,22 +76,25 @@ def build_site(history_dir: Path = HISTORY, output_dir: Path = OUTPUT) -> dict:
         if not match:
             continue
         day = parse_day(match.group(1))
-        csv_path = history_dir / f"{day}.csv"
+        scan_id = path.name.removesuffix("-summary.json")
+        if match.group(2) and (not match.group(2).isdigit() or int(match.group(2)[:2]) > 23 or int(match.group(2)[2:]) > 59):
+            raise ValueError(f"Invalid scan time: {scan_id}")
+        csv_path = history_dir / f"{scan_id}.csv"
         if not csv_path.is_file():
-            raise ValueError(f"Missing CSV for {day}")
-        record = read_scan(csv_path, path, day)
-        (output_dir / f"{day}.json").write_text(json.dumps(record, ensure_ascii=True, separators=(",", ":")) + "\n", encoding="utf-8")
-        scans.append({"date": day, "passed": record["summary"]["passed"],
+            raise ValueError(f"Missing CSV for {scan_id}")
+        record = read_scan(csv_path, path, day, scan_id)
+        (output_dir / f"{scan_id}.json").write_text(json.dumps(record, ensure_ascii=True, separators=(",", ":")) + "\n", encoding="utf-8")
+        scans.append({"date": day, "scan_id": scan_id, "scanned_at": record["scanned_at"], "passed": record["summary"]["passed"],
                       "valid": record["summary"]["valid_stocks"],
                       "total": record["summary"]["total_stocks"],
                       "rules_version": record["rules_version"]})
-        known.add(f"{day}.json")
+        known.add(f"{scan_id}.json")
     # Remove old generated dates that no longer exist in the source history.
-    for path in output_dir.glob("????-??-??.json"):
+    for path in output_dir.glob("????-??-??*.json"):
         if path.name not in known:
             path.unlink()
-    scans.reverse()
-    manifest = {"latest": scans[0]["date"] if scans else None, "scans": scans}
+    scans.sort(key=lambda item: (item["date"], item["scan_id"][11:] if len(item["scan_id"]) > 10 else "0000"), reverse=True)
+    manifest = {"latest": scans[0]["scan_id"] if scans else None, "scans": scans}
     (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
 

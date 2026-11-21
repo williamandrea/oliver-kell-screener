@@ -1,4 +1,4 @@
-SOURCE="$HOME/Downloads/idx-screener-web-changes"
+SOURCE="$HOME/Downloads/idx-screener-four-scans-fixes"
 DEST="/Users/topremitdevice/Desktop/WA/oliver-kell-screener"
 
 if [ -d "$SOURCE" ] && [ -d "$DEST" ]; then

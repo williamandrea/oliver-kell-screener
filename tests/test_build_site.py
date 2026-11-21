@@ -38,6 +38,25 @@ class SiteBuildTests(unittest.TestCase):
             self.assertEqual(content["stocks"][0]["value_ma5_idr"], 6000000000)
             self.assertEqual(content["summary"]["valid_stocks"], 900)
 
+    def test_two_scans_on_same_day_are_kept(self):
+        with TemporaryDirectory() as temporary:
+            source, output = Path(temporary) / "history", Path(temporary) / "web"
+            source.mkdir()
+            self.add_day(source, "2026-11-20", [{"ticker": "BBCA", "price": "1000"}])
+            for clock, ticker in (("0945", "BRIS"), ("1545", "PKPK")):
+                original = "2026-11-20"
+                scan_id = f"{original}-{clock}"
+                (source / f"{scan_id}.csv").write_bytes((source / f"{original}.csv").read_bytes())
+                summary = json.loads((source / f"{original}-summary.json").read_text())
+                summary["scan_id"] = scan_id
+                summary["scanned_at"] = f"2026-11-20T{clock[:2]}:{clock[2:]}:00+07:00"
+                (source / f"{scan_id}-summary.json").write_text(json.dumps(summary))
+            manifest = build_site(source, output)
+            self.assertEqual(len(manifest["scans"]), 3)
+            self.assertEqual(manifest["latest"], "2026-11-20-1545")
+            self.assertTrue((output / "2026-11-20-0945.json").exists())
+            self.assertTrue((output / "2026-11-20.json").exists())
+
     def test_refuse_bad_ticker(self):
         with TemporaryDirectory() as temporary:
             source, output = Path(temporary) / "history", Path(temporary) / "web"
