@@ -34,3 +34,46 @@ class ScreenerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Tests added after the first GitHub Actions run failed on a Saturday.
+from datetime import date
+from screener import select_scan_date, eligible_symbols, update_exclusions, split_download
+
+
+class WorkflowFixTests(unittest.TestCase):
+    def sample(self, last):
+        dates = pd.bdate_range(end=last, periods=65)
+        return pd.DataFrame({"Close": [1000 + i * 20 for i in range(65)],
+                             "Volume": [10_000_000] * 65}, index=dates)
+
+    def test_weekend_uses_friday(self):
+        data = {"BBCA.JK": self.sample("2026-11-20"), "BBRI.JK": self.sample("2026-11-20")}
+        self.assertEqual(select_scan_date(data, date(2026, 11, 21)), "2026-11-20")
+        self.assertEqual(screen_stock(data["BBCA.JK"], "2026-11-20")[0], "passed")
+
+    def test_reject_old_trading_dates(self):
+        data = {"BBCA.JK": self.sample("2026-11-06")}
+        with self.assertRaises(ValueError):
+            select_scan_date(data, date(2026, 11, 21))
+
+    def test_choose_majority_date_not_one_new_ticker(self):
+        data = {"A.JK": self.sample("2026-11-20"), "B.JK": self.sample("2026-11-20"),
+                "C.JK": self.sample("2026-11-21")}
+        self.assertEqual(select_scan_date(data, date(2026, 11, 21)), "2026-11-20")
+
+    def test_missing_twice_is_skipped_then_rechecked(self):
+        symbol = "ARMY.JK"
+        first = update_exclusions({}, [symbol], {}, [symbol], date(2026, 11, 21))
+        self.assertEqual(first[symbol]["consecutive_failures"], 1)
+        self.assertEqual(eligible_symbols([symbol], first, date(2026, 11, 22))[0], [symbol])
+        second = update_exclusions(first, [symbol], {}, [symbol], date(2026, 11, 22))
+        self.assertEqual(eligible_symbols([symbol], second, date(2026, 11, 23))[1], [symbol])
+        self.assertEqual(eligible_symbols([symbol], second, date(2026, 12, 22))[0], [symbol])
+        recovered = update_exclusions(second, [symbol], {symbol: self.sample("2026-12-22")}, [], date(2026, 12, 22))
+        self.assertNotIn(symbol, recovered)
+
+    def test_batch_split(self):
+        frame = self.sample("2026-11-20")
+        combined = pd.concat({"BBCA.JK": frame, "BBRI.JK": frame}, axis=1)
+        out = split_download(combined, ["BBCA.JK", "BBRI.JK", "LOST.JK"])
+        self.assertEqual(sorted(out), ["BBCA.JK", "BBRI.JK"])
