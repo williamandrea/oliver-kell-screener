@@ -26,6 +26,40 @@ function addCell(row, text, className = "") {
   row.append(cell);
 }
 
+// Logo URLs only accept ordinary IDX stock codes, never arbitrary URLs.
+function stockLogoUrl(ticker) {
+  const symbol = String(ticker || "").toUpperCase();
+  return /^[A-Z0-9]{3,6}$/.test(symbol)
+    ? `https://assets.stockbit.com/logos/companies/${symbol}.png`
+    : null;
+}
+
+function addStockCell(row, ticker) {
+  const cell = document.createElement("td");
+  const content = document.createElement("span");
+  content.className = "stock-cell";
+  const symbol = String(ticker || "—").replace(/\.JK$/i, "").toUpperCase();
+  const url = stockLogoUrl(symbol);
+  if (url) {
+    const logo = document.createElement("img");
+    logo.className = "stock-logo";
+    logo.src = url;
+    logo.alt = ""; // The stock code beside it already identifies the company.
+    logo.width = 26;
+    logo.height = 26;
+    logo.loading = "lazy";
+    logo.decoding = "async";
+    logo.referrerPolicy = "no-referrer";
+    logo.addEventListener("error", () => logo.remove(), { once: true });
+    content.append(logo);
+  }
+  const code = document.createElement("span");
+  code.textContent = symbol;
+  content.append(code);
+  cell.append(content);
+  row.append(cell);
+}
+
 function label(value, format = number, prefix = "", suffix = "") {
   if (value === null || value === undefined || value === "") return "—";
   const n = Number(value);
@@ -46,7 +80,7 @@ function showStocks(stocks) {
   }
   for (const stock of stocks) {
     const row = document.createElement("tr");
-    addCell(row, String(stock.ticker || "—"));
+    addStockCell(row, stock.ticker);
     addCell(row, label(stock.price), "right");
     addCell(row, label(stock.value_ma5_idr, compact, "Rp"), "right");
     addCell(row, label(stock.avg_range_5d_pct, decimal, "", "%"), "right");

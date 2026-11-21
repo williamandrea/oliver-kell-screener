@@ -28,4 +28,9 @@ assert.match(warnings("2026-11-21T17:00:00+07:00", "2026-11-20T18:45:00+07:00", 
 // Both warnings can appear together; future timestamps do not cause false stale warning.
 assert.equal(warnings("2026-11-23T11:16:00+07:00", "2026-11-20T18:45:00+07:00", 100).length, 2);
 assert.deepEqual(warnings("2026-11-20T18:45:00+07:00", "2026-11-20T18:46:00+07:00"), []);
-console.log("Website warning tests passed (9 checks)");
+// Only valid IDX symbols may be used for the external company logo.
+assert.equal(vm.runInContext('stockLogoUrl("BRIS")', context), "https://assets.stockbit.com/logos/companies/BRIS.png");
+assert.equal(vm.runInContext('stockLogoUrl("PKPK")', context), "https://assets.stockbit.com/logos/companies/PKPK.png");
+assert.equal(vm.runInContext('stockLogoUrl("../wrong")', context), null);
+assert.equal(vm.runInContext('stockLogoUrl("AAA?x=1")', context), null);
+console.log("Website warning and logo tests passed (13 checks)");

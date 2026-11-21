@@ -135,3 +135,12 @@ User approved a dark, mobile-friendly website styled like the second design refe
 - `tests/test_site_warnings.js` checks schedule, weekends, Friday times, and missing-data threshold. Run with `node tests/test_site_warnings.js` (Node.js built-in tools only).
 - Checks: 23 Python tests and 9 website warning checks passed locally. Production GitHub Pages has **not** been retested after this change.
 - **Next:** overwrite the changed files in the repo (preserve directory structure), commit and push; load the public website. Warnings appear only if data becomes late/incomplete, so a healthy scan shows no warning.
+
+## Latest change (2026-11-21): Stockbit company logos
+
+- Added small company logos beside stock codes in the latest results table using `https://assets.stockbit.com/logos/companies/{TICKER}.png`.
+- `docs/assets/app.js` uses only checked IDX ticker codes for logo URLs, creates DOM nodes safely (no HTML strings), loads logos lazily, and hides broken images without hiding the stock code.
+- `docs/assets/styles.css` adds a small fixed-size logo style for desktop and mobile.
+- `tests/test_site_warnings.js` adds basic checks for allowed and rejected logo paths.
+- No changes to stock rules, history data, or workflow schedule. The GitHub workflow currently schedules four scans per weekday, but as checked on 2026-11-21 the public Actions history shows only manual scan runs. The first scheduled run should occur on Monday 2026-11-23 (subject to GitHub delays).
+- Next: upload only changed files, push, check logo loading and fallback on GitHub Pages; verify that a scheduled run appears under Actions after the next weekday slot.
