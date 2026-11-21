@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-20",
+  "total_stocks": 962,
+  "valid_stocks": 916,
+  "passed": 35,
+  "missing_or_invalid": 46,
+  "temporarily_skipped": 0,
+  "value_note": "Close times Yahoo volume: approximate daily traded value"
+}
