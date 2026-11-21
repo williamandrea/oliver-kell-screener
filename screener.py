@@ -30,6 +30,9 @@ MIN_UNIVERSE = 700
 BATCH_SIZE = 40
 MIN_BARS = 45
 VALUE_MIN = 5_000_000_000
+PRICE_MIN = 250
+RANGE_MIN_PCT = 5.0
+MAX_ABOVE_MA20 = 1.05
 LOCAL_TZ = ZoneInfo("Asia/Jakarta")
 
 
@@ -85,7 +88,7 @@ def split_download(data: pd.DataFrame | None, symbols: list[str]) -> dict[str, p
     for symbol in symbols:
         try:
             frame = data[symbol] if isinstance(data.columns, pd.MultiIndex) else data
-            frame = frame[["Close", "Volume"]].dropna(subset=["Close", "Volume"])
+            frame = frame[["Close", "High", "Low", "Volume"]].dropna(subset=["Close", "High", "Low", "Volume"])
             if not frame.empty:
                 result[symbol] = frame
         except (KeyError, TypeError):
@@ -200,39 +203,54 @@ def screen_stock(frame: pd.DataFrame, scan_date: str) -> tuple[str, dict | None]
     dates = pd.to_datetime(frame.index).strftime("%Y-%m-%d")
     if dates[-1] != scan_date:
         return "invalid", None
+    required = {"Close", "High", "Low", "Volume"}
+    if not required.issubset(frame.columns):
+        return "invalid", None
     close = pd.to_numeric(frame["Close"], errors="coerce")
+    high = pd.to_numeric(frame["High"], errors="coerce")
+    low = pd.to_numeric(frame["Low"], errors="coerce")
     volume = pd.to_numeric(frame["Volume"], errors="coerce")
-    if (close.isna().any() or volume.isna().any() or (close <= 0).any()
-            or (volume < 0).any()):
+    if (close.isna().any() or high.isna().any() or low.isna().any()
+            or volume.isna().any() or (close <= 0).any() or (low <= 0).any()
+            or (high < low).any() or (volume < 0).any()):
         return "invalid", None
     ema10 = close.ewm(span=10, adjust=False).mean()
     ema20 = close.ewm(span=20, adjust=False).mean()
-    value_ma20 = (close * volume).tail(20).mean()
+    value_ma5 = (close * volume).tail(5).mean()
+    range_5d_pct = ((high - low) / low * 100).tail(5).mean()
+    ma20 = close.tail(20).mean()
     price = float(close.iloc[-1])
     current_ema10 = float(ema10.iloc[-1])
     current_ema20 = float(ema20.iloc[-1])
     old_ema20 = float(ema20.iloc[-6])  # 5 trading sessions ago
-    passed = (price >= current_ema10 >= current_ema20 >= old_ema20
-              and value_ma20 >= VALUE_MIN)
+    passed = (price >= PRICE_MIN
+              and price >= current_ema10 >= current_ema20 >= old_ema20
+              and value_ma5 >= VALUE_MIN
+              and range_5d_pct >= RANGE_MIN_PCT
+              and price <= float(ma20) * MAX_ABOVE_MA20)
     if not passed:
         return "failed", None
     return "passed", {
         "ticker": "", "price": round(price, 2), "ema10": round(current_ema10, 2),
         "ema20": round(current_ema20, 2), "ema20_5d_ago": round(old_ema20, 2),
-        "value_ma20_idr": round(float(value_ma20)),
+        "value_ma5_idr": round(float(value_ma5)),
+        "avg_range_5d_pct": round(float(range_5d_pct), 2),
+        "ma20": round(float(ma20), 2),
     }
 
 
 def save_results(date: str, rows: list[dict], missing: list[str], total: int, valid: int, skipped: int = 0) -> None:
     HISTORY.mkdir(parents=True, exist_ok=True)
     with (HISTORY / f"{date}.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["ticker", "price", "ema10", "ema20", "ema20_5d_ago", "value_ma20_idr"])
+        writer = csv.DictWriter(handle, fieldnames=["ticker", "price", "ema10", "ema20", "ema20_5d_ago", "value_ma5_idr", "avg_range_5d_pct", "ma20"])
         writer.writeheader()
         writer.writerows(sorted(rows, key=lambda row: row["ticker"]))
     (HISTORY / f"{date}-missing.txt").write_text("\n".join(sorted(missing)) + ("\n" if missing else ""), encoding="utf-8")
     summary = {"date": date, "total_stocks": total, "valid_stocks": valid,
                "passed": len(rows), "missing_or_invalid": len(missing), "temporarily_skipped": skipped,
-               "value_note": "Close times Yahoo volume: approximate daily traded value"}
+               "value_note": "5-day mean of close times Yahoo volume: approximate daily traded value",
+               "range_note": "5-day mean of (High - Low) / Low * 100",
+               "rules_version": 2}
     (HISTORY / f"{date}-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
     if rows:

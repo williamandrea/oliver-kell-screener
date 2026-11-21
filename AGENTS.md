@@ -13,16 +13,19 @@ Read this file before making changes. Update it after **every code or project ch
 
 Build a free Python CLI stock screener for **all available IDX/IHSG-listed stocks** using Yahoo Finance data. Run it automatically using GitHub Actions; no local computer or paid server required. Future goals: Telegram alerts and a simple way to view past screener results.
 
-## Screening rules (confirmed)
+## Screening rules (confirmed, 7 rules)
 
-A stock passes only if **all four** pass, using daily data:
+A stock passes only if **all seven** pass using daily data:
 
-1. Latest daily close >= EMA(10).
-2. EMA(10) >= EMA(20).
-3. EMA(20) today >= EMA(20) from **5 trading sessions earlier**.
-4. Mean of `daily close * daily volume` over the last **20 trading sessions** >= **IDR 5,000,000,000**.
+1. Latest daily close >= IDR 250.
+2. Latest daily close >= EMA(10).
+3. EMA(10) >= EMA(20).
+4. EMA(20) today >= EMA(20) from 5 trading sessions earlier.
+5. Mean of `daily close * daily volume` over the last **5 trading sessions** >= IDR 5,000,000,000 (replaces previous 20-day rule).
+6. Mean of `(daily high - daily low) / daily low * 100` over last 5 trading sessions >= 5%.
+7. Latest daily close <= SMA(20) * 1.05. No requirement to be above SMA(20).
 
-Rule 4 is only a **trading value estimate**, not official traded value. Do not silently change the meaning.
+Trading value is an estimate, not the exchange's official reported turnover.
 
 ## Confirmed decisions
 
@@ -88,4 +91,13 @@ Fixes in this update:
 - Use `actions/checkout@v7` and `actions/setup-python@v7`, plus commit the exclusion file to GitHub.
 - Added tests for weekend dates, stale data, mixed data dates, missing-ticker handling, and batch data format.
 
-**Current stage:** Stage 1 is running on GitHub, but the first full run failed; fixes are unit-tested but **not yet live-tested** on GitHub. Next: user uploads the fix files, commits, re-runs the workflow and shares any new error logs. The 4 screening rules remain unchanged. Daily price caching and Telegram are still future features.
+**Current stage:** Stage 1 is running on GitHub, but the first full run failed; fixes are unit-tested but **not yet live-tested** on GitHub. Next: user uploads the fix files, commits, re-runs the workflow and shares any new error logs. The screening rules were later expanded to 7 rules (see newest change log). Daily price caching and Telegram are still future features.
+
+## Latest change (2026-11-21): expanded to 7 screening rules
+
+- User approved 7 rules above. Value MA20 replaced by Value MA5; added price floor, average five-day daily range, and a 5% ceiling above simple MA20.
+- `screener.py`: downloads Yahoo `High` and `Low` alongside `Close` and `Volume`; checks seven rules; writes new fields `value_ma5_idr`, `avg_range_5d_pct`, `ma20`. CSVs saved on future scans use the new format; old history is not rewritten.
+- `tests/test_screener.py`: 16 local tests passed, including all new rules and missing OHLC data.
+- `README.md`: updated rules and output format.
+- `.github/workflows/daily.yml` unchanged. Current user report: GitHub workflow has already succeeded under the previous four-rule version. The seven-rule update is **not yet verified on GitHub**.
+- **Next:** upload changed files preserving paths; run workflow manually and inspect `history/` CSV and summary; then discuss Telegram alerts.

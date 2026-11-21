@@ -6,12 +6,15 @@ Scans IDX stocks with free Yahoo Finance daily data. Saves daily matched stocks 
 
 ## Rules
 
-A stock passes only when all four rules are true:
+A stock passes only when all seven rules are true:
 
-1. Last close >= EMA 10
-2. EMA 10 >= EMA 20
-3. EMA 20 >= EMA 20 from 5 trading days earlier
-4. Average (last 20 daily close * volume) >= Rp5,000,000,000
+1. Last close >= Rp250
+2. Last close >= EMA 10
+3. EMA 10 >= EMA 20
+4. EMA 20 >= EMA 20 from 5 trading days earlier
+5. Average (daily close * volume) over the last 5 trading days >= Rp5,000,000,000
+6. Average daily range for 5 trading days >= 5%, where each day's range is `(High - Low) / Low * 100`
+7. Last close <= 1.05 * MA 20 (simple average of the last 20 closes). A price below MA 20 is allowed.
 
 **Note:** Rule 4 is an **estimate** of trading value, not actual exchange-recorded turnover. Yahoo volume and raw closing price are used.
 
@@ -29,7 +32,7 @@ GitHub can delay or miss scheduled jobs. On a market holiday the scan should not
 
 Every successful full scan saves:
 
-- `history/YYYY-MM-DD.csv`: stocks passing all four rules
+- `history/YYYY-MM-DD.csv`: stocks passing all seven rules
 - `history/YYYY-MM-DD-summary.json`: number scanned, valid, passing, missing
 - `history/YYYY-MM-DD-missing.txt`: stocks that failed or had unusable/stale data
 - `data/stocks.csv`: the downloaded stock code list, kept as a backup
@@ -67,3 +70,9 @@ A full scan downloads around 3 months for each stock in batches of 40. This firs
 - If there are no recent market dates or none of the stocks have valid prices, the scan still stops rather than saving false history.
 
 To apply just the fix ZIP, extract it **over the existing project**, keeping its folders (especially `.github/workflows/`). Do not remove existing `history/` or `data/stocks.csv` files. Re-run **Actions > Daily IDX Scan > Run workflow** after committing the changes.
+
+## Screening rule update (2026-11-21)
+
+The screener now uses 7 rules. Output CSV columns: `ticker`, `price`, `ema10`, `ema20`, `ema20_5d_ago`, `value_ma5_idr`, `avg_range_5d_pct`, and `ma20`. The old `value_ma20_idr` output was replaced.
+
+`High` and `Low` are required from Yahoo Finance. Stocks with missing or invalid fields are reported as invalid, not failed. The GitHub Actions schedule is unchanged.
