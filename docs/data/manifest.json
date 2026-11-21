@@ -1,4 +1,12 @@
 {
-  "latest": null,
-  "scans": []
+  "latest": "2026-11-20",
+  "scans": [
+    {
+      "date": "2026-11-20",
+      "passed": 2,
+      "valid": 916,
+      "total": 962,
+      "rules_version": 2
+    }
+  ]
 }
