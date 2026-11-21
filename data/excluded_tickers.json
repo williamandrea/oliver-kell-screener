@@ -1,1 +1,217 @@
-{}
+{
+  "ARMY.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "BTEL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "CBMF.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "COWL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "CPRI.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "DUCK.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "ENVY.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "GAMA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "GOLL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "HKMU.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "HOME.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "HOTL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "IIKP.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "JSKY.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "KBRI.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "LCGP.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "LMAS.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "MABA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "MAGP.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "META.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "MTRA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "NUSA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "OCAP.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "PLAS.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "POOL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "POSA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "PURE.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "RIMO.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SBAT.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SCPI.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SIMA.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SKYB.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SMRU.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SRIL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "SUGI.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TDPM.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TECH.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TOYS.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TRAM.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TRIL.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "TRIO.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "UNIT.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  },
+  "WSKT.JK": {
+    "consecutive_failures": 1,
+    "last_checked": "2026-11-21",
+    "reason": "Yahoo returned no price data; not confirmed delisted"
+  }
+}
