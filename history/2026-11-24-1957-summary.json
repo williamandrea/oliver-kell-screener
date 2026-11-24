@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-24",
+  "scan_id": "2026-11-24-1957",
+  "scanned_at": "2026-11-24T19:57:57+07:00",
+  "total_stocks": 962,
+  "valid_stocks": 834,
+  "passed": 1,
+  "missing_or_invalid": 128,
+  "temporarily_skipped": 43,
+  "value_note": "5-day mean of close times Yahoo volume: approximate daily traded value",
+  "range_note": "5-day mean of (High - Low) / Low * 100",
+  "rules_version": 2
+}
